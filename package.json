@@ -1,0 +1,25 @@
+{
+  "name": "emta7an",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "cross-env NODE_ENV=dev node --watch src/main.js --enable-turbo-mode",
+    "start:prod": "cross-env NODE_ENV=prod node --watch src/main.js --enable-turbo-mode"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "argon2": "^0.45.1",
+    "bcrypt": "^6.0.0",
+    "cross-env": "^10.1.0",
+    "crossenv": "^0.0.2-security",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.4",
+    "zod": "^4.6.5"
+  }
+}
