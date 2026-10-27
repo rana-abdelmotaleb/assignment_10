@@ -28,10 +28,18 @@ const userSchema = Schema(
       enum: roleEnum,
       default: roleEnum.User,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     provider: {
       type: String,
       enum: providerEnum,
       default: providerEnum.system,
+    },
+    profileImage: {
+      type: String,
     },
   },
   { timestamps: true },

@@ -13,24 +13,44 @@ import {
   generateNewAccessToken,
   generateToken,
 } from "../../common/service/token.service.js";
-export const signUp = async (body) => {
-  let { userName, email, password, confirmPassword, gender } = body;
+import { sendEmail } from "../../common/middleware/sendEmail.js";
+import { get, set } from "../../database/redis/redis.service.js";
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<signUp>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+export const signUp = async (body, file) => {
+  let { userName, email, password, confirmPassword, gender, role } = body;
+  let profileImage;
   if (password !== confirmPassword) {
     return BadRequestException({
       message: "Password and confirm password do not match",
     });
   }
+  if (file) {
+    profileImage = file.path;
+  }
   let exits = await userModel.findOne({ email });
   if (!exits) {
     let hashPassword = await bycript.hash(password, Number(env.salt));
     // let hashPassword = await argon2.hash(password);
+    let otp = Math.round(Math.random() * 1000000);
     let data = await userModel.create({
       userName,
       email,
       password: hashPassword,
       gender,
+
+      ...(role && { role }),
+      profileImage: profileImage,
     });
+    await set(`otp::${data._id}`, otp, 60);
+    console.log(`otp::${data._id}`);
+
     if (hashPassword) {
+      await sendEmail({
+        to: email,
+        subject: "signup otp",
+        html: `<h1>your otp is ${otp}</h1>`,
+      });
+
       return { message: "User created successfully", data };
     }
   } else {
@@ -73,4 +93,31 @@ export const generateAccessToken = async (body) => {
     return { message: "Access token generated successfully", accessToken };
   }
   return UnauthorizedException({ message: "Invalid refresh token" });
+};
+
+export const verifyAccount = async (body) => {
+  let { otp, email } = body;
+  let data = await userModel.findOne({ email });
+  if (!data) {
+    return NotFoundException({ message: "User not found" });
+  }
+  if (data.isVerified) {
+    return BadRequestException({
+      message: "user already verified",
+    });
+  }
+  let redisOtp = get(`otp::${data._id}`);
+
+  if (redisOtp != otp) {
+    return BadRequestException({
+      message: "otp dont match",
+    });
+  }
+  data.isVerified = true;
+  await data.save();
+  return data;
+};
+export const getAllUsers = async () => {
+  let data = await userModel.find();
+  return data;
 };

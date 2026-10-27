@@ -10,6 +10,8 @@ const accessSignUser = process.env.ACCESS_SIGN_USER;
 const refreshSignUser = process.env.REFRESH_SIGN_USER;
 const accessSignAdmin = process.env.ACCESS_SIGN_ADMIN;
 const refreshSignAdmin = process.env.REFRESH_SIGN_ADMIN;
+const email = process.env.EMAIL;
+const password = process.env.PASSWORD;
 
 export const env = {
   port,
@@ -19,4 +21,6 @@ export const env = {
   refreshSignUser,
   accessSignAdmin,
   refreshSignAdmin,
+  email,
+  password,
 };
